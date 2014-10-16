@@ -37,9 +37,11 @@ public class BinaryImageProcessing {
 		printBinaryImage(inputMatrix, row, column);
 		System.out.println("__________________________________________________");
 
+		int resultMatrix[][] = inputMatrix;
+
 		// Q (A)(i) Pattern pre-processing by Cleaning and Smoothing
 		// Function Call to Binary Image Smoothing using 3x3 filter mask
-		int resultMatrix[][] = binaryImageSmoothing(inputMatrix, row, column);
+		resultMatrix = binaryImageSmoothing(resultMatrix, row, column);
 
 		System.out.println("\nResult of Binary Image Smoothing using 3x3 filter mask:");
 		System.out.println("_______________BINARY IMAGE AFTER SMOOTHING_______________");
@@ -111,9 +113,9 @@ public class BinaryImageProcessing {
 		int resultMatrix2[][] = thinningBinaryImage(resultNormaizedMatrix);
 		
 		System.out.println("\nResult of Thinning Formulae Binary Image:");
-		System.out.println("_______________BINARY IMAGE AFTER THINNING_______________");
+		System.out.println("_______________BINARY IMAGE SKELETONIZATION USING THINNING_______________");
 		printBinaryImage(resultNormaizedMatrix, normalizedRow, normalizedColumn);
-		System.out.println("_________________________________________________________");
+		System.out.println("_________________________________________________________________________");
 		
 	}
 
@@ -166,26 +168,21 @@ public class BinaryImageProcessing {
 	*/
 	private static int[][] binaryImageSmoothing(int[][] binaryMatrix, int row, int column) {
 		boolean isPixelChange;
-		int filterValue = 0;
-		do {
-			isPixelChange = false;
-			for (int x = row - 2; x > 0; x--) {
-				for (int y = column - 2; y > 0; y--) {
-					isPixelChange = isPixelChange || smoothBinaryPoint(binaryMatrix, x, y, filterValue);
-				}
+		isPixelChange = false;
+		for (int x = row - 2; x > 0; x--) {
+			for (int y = column - 2; y > 0; y--) {
+				isPixelChange = isPixelChange || smoothBinaryPoint(binaryMatrix, x, y);
 			}
-			filterValue++;
-			filterValue = filterValue % 4;
-		} while (isPixelChange);
+		}
 		return binaryMatrix;
 	}
 	
 	/*
 	 * Function call to smoothen every pixel
 	*/
-	private static boolean smoothBinaryPoint(int[][] binaryMatrix, int x, int y, int filterValue) {
-		if (filterValue == 0
-				&& binaryMatrix[x][y - 1] == binaryMatrix[x - 1][y - 1]
+	private static boolean smoothBinaryPoint(int[][] binaryMatrix, int x, int y)//, int filterValue) 
+	{
+		if (binaryMatrix[x][y - 1] == binaryMatrix[x - 1][y - 1]
 				&& binaryMatrix[x - 1][y - 1] == binaryMatrix[x - 1][y]
 				&& binaryMatrix[x - 1][y] == binaryMatrix[x - 1][y + 1]
 				&& binaryMatrix[x - 1][y + 1] == binaryMatrix[x][y + 1]
@@ -193,8 +190,7 @@ public class BinaryImageProcessing {
 			binaryMatrix[x][y] = binaryMatrix[x][y - 1];
 			return true;
 		}
-		if (filterValue == 1
-				&& binaryMatrix[x - 1][y] == binaryMatrix[x - 1][y + 1]
+		if (binaryMatrix[x - 1][y] == binaryMatrix[x - 1][y + 1]
 				&& binaryMatrix[x - 1][y + 1] == binaryMatrix[x][y + 1]
 				&& binaryMatrix[x][y + 1] == binaryMatrix[x + 1][y + 1]
 				&& binaryMatrix[x + 1][y + 1] == binaryMatrix[x + 1][y]
@@ -202,8 +198,7 @@ public class BinaryImageProcessing {
 			binaryMatrix[x][y] = binaryMatrix[x - 1][y];
 			return true;
 		}
-		if (filterValue == 2
-				&& binaryMatrix[x][y + 1] == binaryMatrix[x + 1][y + 1]
+		if (binaryMatrix[x][y + 1] == binaryMatrix[x + 1][y + 1]
 				&& binaryMatrix[x + 1][y + 1] == binaryMatrix[x + 1][y]
 				&& binaryMatrix[x + 1][y] == binaryMatrix[x + 1][y - 1]
 				&& binaryMatrix[x + 1][y - 1] == binaryMatrix[x][y - 1]
@@ -211,8 +206,7 @@ public class BinaryImageProcessing {
 			binaryMatrix[x][y] = binaryMatrix[x][y + 1];
 			return true;
 		}
-		if (filterValue == 3
-				&& binaryMatrix[x + 1][y] == binaryMatrix[x + 1][y - 1]
+		if (binaryMatrix[x + 1][y] == binaryMatrix[x + 1][y - 1]
 				&& binaryMatrix[x + 1][y - 1] == binaryMatrix[x][y - 1]
 				&& binaryMatrix[x][y - 1] == binaryMatrix[x - 1][y - 1]
 				&& binaryMatrix[x - 1][y - 1] == binaryMatrix[x - 1][y]
@@ -282,8 +276,8 @@ public class BinaryImageProcessing {
 	*/
 	private static int[][] sizeNormalization(int[][] binaryMatrix, int row, int column) {
 		int[][] resultMatrix = new int[1000][1000];
-		for(int x = 1; x < row; x++){
-			for(int y = 1; y < column; y++){
+		for(int x = 0; x < row; x++){
+			for(int y = 0; y < column; y++){
 				normalizedRow = x / 2 ;
 				normalizedColumn = y / 2;
 				resultMatrix[normalizedRow][normalizedColumn] = binaryMatrix[x][y];
@@ -339,7 +333,6 @@ public class BinaryImageProcessing {
 		sumX = sumX / pixelCount ;
 		sumY = sumY / pixelCount ;
 		return new Pixel( sumX, sumY);
-		
 	}
 
 }
